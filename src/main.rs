@@ -14,30 +14,30 @@ fn main() {
 
         let mut choice = String::new();
         io::stdin().read_line(&mut choice).unwrap();
-        let choice = choice.trim();
+        choice = choice.trim().to_lowercase();
 
         if choice.is_empty() {
             break;
         }
-        
-        let mut choices = choice.split(',');
+
+        let mut choices: Vec<&str> = choice.split(',').collect();
 
         for choice in &mut choices {
-            if let Some(pos) = remaining.iter().position(|&icon| icon == choice) {
+            if let Some(pos) = remaining.iter().position(|&icon| icon == *choice) {
                 remaining.remove(pos);
                 selected.push(choice.to_string());
-                println!("Chosen: {}", choice);
             } else {
                 println!("Not found: {}", choice);
             }
         }
     }
-    
+
+
     if selected.len() == 0 {
         println!("No icons selected.");
         return;
     }
-    
+
 
     println!("\nFinal Selection:");
     println!("{}", selected.join(","));
