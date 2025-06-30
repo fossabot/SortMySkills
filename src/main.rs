@@ -8,13 +8,13 @@ fn main() {
 
     let mut icons = String::new();
     io::stdin().read_line(&mut icons).unwrap();
-    icons = icons.trim().to_lowercase();
+    icons = icons.trim().to_string();
 
     if icons.is_empty() {
-        icons = icons_string.parse().unwrap();
+        icons = icons_string.to_string();
         println!("Emptying the list and using the provided icons.");
     }
-    
+
     let mut remaining: Vec<&str> = icons.split(',').collect();
     let mut selected = Vec::new();
 
@@ -27,34 +27,39 @@ fn main() {
 
         let mut choice = String::new();
         io::stdin().read_line(&mut choice).unwrap();
-        choice = choice.trim().to_lowercase();
+        choice = choice.trim().to_string();
 
         if choice.is_empty() {
             break;
         }
 
-        let mut choices: Vec<&str> = choice.split(',').collect();
+        let choices: Vec<&str> = choice.split(',').map(|s| s.trim()).collect();
 
-        for choice in &mut choices {
-            if let Some(pos) = remaining.iter().position(|&icon| icon == *choice) {
-                remaining.remove(pos);
-                selected.push(choice.to_string());
+        for input in choices {
+            if let Some(pos) = find_icon_position(&remaining, input) {
+                selected.push(remaining.remove(pos).to_string());
             } else {
-                println!("Not found: {}", choice);
+                println!("Not found: {}", input);
             }
         }
     }
 
-
-    if selected.len() == 0 {
+    if selected.is_empty() {
         println!("No icons selected.");
         return;
     }
-
 
     println!("\nFinal Selection:");
     println!("{}", selected.join(","));
 
     println!("\nRemaining:");
     println!("{}", remaining.join(","));
+}
+
+fn find_icon_position(remaining: &[&str], input: &str) -> Option<usize> {
+    if let Some(pos) = remaining.iter().position(|&icon| icon.eq_ignore_ascii_case(input)) {
+        return Some(pos);
+    }
+
+    remaining.iter().position(|&icon| icon.to_lowercase().starts_with(&input.to_lowercase()))
 }
